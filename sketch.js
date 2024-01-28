@@ -1,11 +1,12 @@
 let bgColor = 50; // A slightly lighter gray than black
 let gridSize = 20; // Base size for each square in the grid
-let gridOpacity = 255; // halfway between transparent and opaque
+let gridOpacity = 255; // Full opacity
 
+// Define an array to hold grid configurations
 let grids = [
-  { pct: 0.25, color: [255, 0, 0, gridOpacity], lineWidth: 2 }, // Red grid with opacity
-  { pct: 0.5, color: [0, 255, 0, gridOpacity], lineWidth: 2 }, // Green grid with opacity
-  { pct: 0.75, color: [0, 0, 255, gridOpacity], lineWidth: 2 }, // Blue grid with opacity
+  { pct: 0.25, color: [255, 0, 0, gridOpacity], lineWidth: 2, yOffset: 0 }, // Red grid
+  { pct: 0.5, color: [0, 255, 0, gridOpacity], lineWidth: 2, yOffset: 0 }, // Green grid
+  { pct: 0.75, color: [0, 0, 255, gridOpacity], lineWidth: 2, yOffset: 0 }, // Blue grid
 ];
 
 function setup() {
@@ -13,40 +14,52 @@ function setup() {
   canvas.parent("sketch-holder");
   background(bgColor);
 
-  blendMode(ADD); //additive
+  blendMode(ADD); // Set blend mode to ADD for color blending
 
-  setupSlider(); // Initialize the main slider
-  setupOffCenterSlider(); // Initialize the off-center slider
+  setupSlider(); // Initialize sliders
+  setupOffCenterSlider();
   setupGridSizeSlider();
   setupLineThicknessSlider();
   setupOpacitySlider();
 
-  noLoop(); // No continuous drawing
+  noLoop(); // Draw only once and update on slider input
 }
 
 function draw() {
-  blendMode(BLEND); // Use default blend mode to clear the canvas properly
-  background(bgColor); // Clear the canvas with the background color
-
-  blendMode(ADD); // Switch to additive blend mode for drawing grids
-  grids.forEach(drawGrid); // Draw each grid
-  blendMode(BLEND); // Switch back to default blend mode after drawing
+  background(bgColor); // Clear the canvas
+  blendMode(ADD); // Set blend mode to ADD for color blending
+  grids.forEach(drawGrid); // Draw each grid based on its configuration
+  blendMode(BLEND); // Reset blend mode
 }
 
-function drawGrid(grid, index) {
-  push(); // Start a new drawing state
-  let xPos = width * grid.pct; // Calculate x position based on percentage
-  let yPos = height / 2 + grid.yOffset; // Apply the yOffset to vertically center
-  translate(xPos, yPos);
-  stroke(grid.color); // Set the grid color including opacity
-  strokeWeight(grid.lineWidth); // Set the line width
-  noFill(); // Don't fill the squares
+function drawGrid(grid) {
+  push(); // Save the current drawing style settings and transformations
+  let gridWidth = width * 0.8; // Adjust the grid width if necessary
+  let gridHeight = height * 0.8; // Adjust the grid height if necessary
+  let startX = width * grid.pct - gridWidth / 2; // Calculate the starting X position
+  translate(startX, height / 2 + grid.yOffset); // Position the grid
 
-  for (let i = 0; i < 10; i++) {
-    let size = gridSize * (i + 1); // Use gridSize to determine the size of each square
-    rect(-size / 2, -size / 2, size, size); // Draw square centered at the current position
+  let numCols = gridSize; // Use gridSize for the number of columns
+  let numRows = gridSize; // Use gridSize for the number of rows
+  let cellWidth = gridWidth / numCols; // Width of each cell
+  let cellHeight = gridHeight / numRows; // Height of each cell
+
+  stroke(grid.color); // Set grid color
+  strokeWeight(grid.lineWidth); // Set line width
+
+  // Draw columns
+  for (let col = 0; col <= numCols; col++) {
+    let x = col * cellWidth;
+    line(x, 0, x, gridHeight); // Draw vertical line within the grid height
   }
-  pop(); // Restore original drawing state
+
+  // Draw rows
+  for (let row = 0; row <= numRows; row++) {
+    let y = row * cellHeight;
+    line(0, y, gridWidth, y); // Draw horizontal line within the grid width
+  }
+
+  pop(); // Restore the settings
 }
 
 function setupSlider() {
@@ -88,9 +101,9 @@ function setupGridSizeSlider() {
   const gridSizeValue = document.getElementById("grid-size-value");
 
   gridSizeSlider.addEventListener("input", () => {
-    gridSize = parseInt(gridSizeSlider.value);
+    gridSize = parseInt(gridSizeSlider.value); // Update gridSize to control the number of rows and columns
     gridSizeValue.textContent = gridSize;
-    redraw(); // Redraw the canvas with the updated grid size
+    redraw(); // Redraw the canvas with the updated grid structure
   });
 }
 
