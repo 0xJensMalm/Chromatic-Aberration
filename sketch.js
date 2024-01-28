@@ -1,6 +1,7 @@
 let bgColor = 50; // A slightly lighter gray than black
 let gridSize = 20; // Base size for each square in the grid
 let gridOpacity = 255; // Full opacity
+let gridScale = 0.8; // Grid scale (80%)
 
 // Define an array to hold grid configurations
 let grids = [
@@ -10,14 +11,15 @@ let grids = [
 ];
 
 function setup() {
-  let canvas = createCanvas(windowWidth * 0.8, windowHeight * 0.8);
-  canvas.parent("sketch-holder");
+  let canvas = createCanvas(windowWidth, windowHeight); // Set canvas to full window size
+  canvas.parent("sketch-holder"); // Attach the canvas to the sketch-holder div
   background(bgColor);
 
   blendMode(ADD); // Set blend mode to ADD for color blending
 
   setupSlider(); // Initialize sliders
   setupOffCenterSlider();
+  setupCellCountSlider();
   setupGridSizeSlider();
   setupLineThicknessSlider();
   setupOpacitySlider();
@@ -33,16 +35,17 @@ function draw() {
 }
 
 function drawGrid(grid) {
-  push(); // Save the current drawing style settings and transformations
-  let gridWidth = width * 0.8; // Adjust the grid width if necessary
-  let gridHeight = height * 0.8; // Adjust the grid height if necessary
-  let startX = width * grid.pct - gridWidth / 2; // Calculate the starting X position
-  translate(startX, height / 2 + grid.yOffset); // Position the grid
+  push(); // Save the current drawing state
+  let gridWidth = width * gridScale; // Scale grid width
+  let gridHeight = height * gridScale; // Scale grid height
+  let startX = width * grid.pct - gridWidth / 2; // Center grid horizontally
+  let startY = (height - gridHeight) / 2; // Center grid vertically
+  translate(startX, startY + grid.yOffset); // Apply translation
 
-  let numCols = gridSize; // Use gridSize for the number of columns
-  let numRows = gridSize; // Use gridSize for the number of rows
-  let cellWidth = gridWidth / numCols; // Width of each cell
-  let cellHeight = gridHeight / numRows; // Height of each cell
+  let numCols = gridSize; // Use gridSize for number of columns (controlled by cell count)
+  let numRows = gridSize; // Use gridSize for number of rows (controlled by cell count)
+  let cellWidth = gridWidth / numCols; // Calculate cell width
+  let cellHeight = gridHeight / numRows; // Calculate cell height
 
   stroke(grid.color); // Set grid color
   strokeWeight(grid.lineWidth); // Set line width
@@ -96,14 +99,25 @@ function setupOffCenterSlider() {
   });
 }
 
+function setupCellCountSlider() {
+  const cellCountSlider = document.getElementById("cell-count-slider");
+  const cellCountValue = document.getElementById("cell-count-value");
+
+  cellCountSlider.addEventListener("input", () => {
+    gridSize = parseInt(cellCountSlider.value); // Now controls the number of cells
+    cellCountValue.textContent = gridSize;
+    redraw(); // Redraw the canvas with the updated cell count
+  });
+}
+
 function setupGridSizeSlider() {
   const gridSizeSlider = document.getElementById("grid-size-slider");
   const gridSizeValue = document.getElementById("grid-size-value");
 
   gridSizeSlider.addEventListener("input", () => {
-    gridSize = parseInt(gridSizeSlider.value); // Update gridSize to control the number of rows and columns
-    gridSizeValue.textContent = gridSize;
-    redraw(); // Redraw the canvas with the updated grid structure
+    gridScale = parseInt(gridSizeSlider.value) / 100; // Converts value to a scale factor
+    gridSizeValue.textContent = gridSizeSlider.value + "%"; // Display the percentage
+    redraw(); // Redraw the canvas with the updated grid size
   });
 }
 
@@ -141,6 +155,6 @@ document
   .addEventListener("click", generateSculpture);
 
 function windowResized() {
-  resizeCanvas(windowWidth * 0.8, windowHeight * 0.8);
-  background(bgColor); // Ensure the background is redrawn correctly after resizing
+  resizeCanvas(windowWidth, windowHeight); // Resize canvas to new window dimensions
+  background(bgColor); // Redraw background when window is resized
 }
