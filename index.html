@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>p5.js Sketch Controls</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="controls">
+        <div id="movement-section">
+            <h2>Movement</h2>
+            <label for="grid-slider">Grid Slider: <span id="grid-slider-value">50</span></label>
+            <input type="range" id="grid-slider" min="0" max="100" value="50">
+            <br>
+            <label for="off-center-slider">Off-Center Slider: <span id="off-center-slider-value">0</span></label>
+            <input type="range" id="off-center-slider" min="-10" max="10" value="0">
+        </div>
+        <div id="structure-section">
+            <h2>Structure</h2>
+            <label for="grid-size-slider">Grid Size: <span id="grid-size-value">20</span></label>
+            <input type="range" id="grid-size-slider" min="10" max="30" value="20">
+            <br>
+            <label for="line-thickness-slider">Line Thickness: <span id="line-thickness-value">2</span></label>
+            <input type="range" id="line-thickness-slider" min="1" max="5" value="2">
+            <br>
+            <button id="generate-btn">Generate</button>
+        </div>
+        <div id="color-section">
+            <h2>Color</h2>
+            <label for="opacity-slider">Opacity: <span id="opacity-value">255</span></label>
+            <input type="range" id="opacity-slider" min="0" max="255" value="255">
+        </div>
+
+    </div>
+    <div id="sketch-holder"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="sketch.js"></script>
+</body>
+
+</html>

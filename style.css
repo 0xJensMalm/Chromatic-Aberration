@@ -1,0 +1,61 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: black;
+    color: white;
+    font-family: 'Arial', sans-serif;
+}
+
+#controls {
+    text-align: center;
+    margin: 10px 0; /* Reduced vertical margin */
+    padding: 5px; /* Reduced padding */
+    display: flex;
+    justify-content: space-around; /* Distribute space evenly around control sections */
+    width: 90%; /* Wider control box to make it slimmer */
+    max-width: 800px; /* Maximum width to avoid too wide on large screens */
+    border: 1px solid #fff; /* Thinner border for sleek look */
+    border-radius: 5px; /* Smaller border radius */
+    background: rgba(255, 255, 255, 0.1); /* Slight transparency */
+}
+
+#movement-section, #structure-section, #color-section {
+    padding: 5px 15px; /* Reduced padding for a slimmer look */
+    border-right: 1px solid #fff; /* Thinner border to separate sections */
+}
+
+#color-section {
+    border-right: none; /* Remove right border for the last section */
+}
+
+h2 {
+    margin: 5px 0; /* Smaller margin for headers */
+    font-size: 1em; /* Smaller font size for headers */
+}
+
+button, input[type="range"], label {
+    font-size: 0.8em; /* Smaller font size for controls and labels */
+}
+
+button {
+    padding: 5px 10px; /* Smaller padding for buttons */
+    border: 1px solid #fff; /* Thinner border for buttons */
+    border-radius: 3px; /* Smaller border radius for buttons */
+    transition: background-color 0.3s; /* Smooth transition for button hover */
+}
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Slight highlight on hover */
+}
+
+input[type="range"] {
+    cursor: pointer;
+}
+
+label {
+    display: block; /* Ensure labels are on their own line */
+    margin: 5px 0; /* Reduced space above and below labels */
+}
