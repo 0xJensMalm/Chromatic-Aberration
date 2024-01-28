@@ -1,7 +1,7 @@
-let bgColor = 50; // A slightly lighter gray than black
-let gridSize = 20; // Base size for each square in the grid
+let bgColor = 20; // A slightly lighter gray than black
+let gridSize = 10; // Default size for each square in the grid
 let gridOpacity = 255; // Full opacity
-let gridScale = 0.8; // Grid scale (80%)
+let gridScale = 0.46; // Grid scale (80%)
 
 // Define an array to hold grid configurations
 let grids = [
@@ -36,30 +36,26 @@ function draw() {
 
 function drawGrid(grid) {
   push(); // Save the current drawing state
-  let gridWidth = width * gridScale; // Scale grid width
-  let gridHeight = height * gridScale; // Scale grid height
-  let startX = width * grid.pct - gridWidth / 2; // Center grid horizontally
-  let startY = (height - gridHeight) / 2; // Center grid vertically
+  let gridDimension = min(width, height) * gridScale; // Use the smaller dimension to keep the grid square
+  let startX = width * grid.pct - gridDimension / 2; // Center grid horizontally
+  let startY = (height - gridDimension) / 2; // Center grid vertically
   translate(startX, startY + grid.yOffset); // Apply translation
 
-  let numCols = gridSize; // Use gridSize for number of columns (controlled by cell count)
-  let numRows = gridSize; // Use gridSize for number of rows (controlled by cell count)
-  let cellWidth = gridWidth / numCols; // Calculate cell width
-  let cellHeight = gridHeight / numRows; // Calculate cell height
+  let cellSize = gridDimension / gridSize; // Calculate cell size to maintain a square grid
 
   stroke(grid.color); // Set grid color
   strokeWeight(grid.lineWidth); // Set line width
 
   // Draw columns
-  for (let col = 0; col <= numCols; col++) {
-    let x = col * cellWidth;
-    line(x, 0, x, gridHeight); // Draw vertical line within the grid height
+  for (let col = 0; col <= gridSize; col++) {
+    let x = col * cellSize;
+    line(x, 0, x, gridDimension); // Draw vertical line within the grid
   }
 
   // Draw rows
-  for (let row = 0; row <= numRows; row++) {
-    let y = row * cellHeight;
-    line(0, y, gridWidth, y); // Draw horizontal line within the grid width
+  for (let row = 0; row <= gridSize; row++) {
+    let y = row * cellSize;
+    line(0, y, gridDimension, y); // Draw horizontal line within the grid
   }
 
   pop(); // Restore the settings
