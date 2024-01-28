@@ -2,6 +2,7 @@ let bgColor = 20; // A slightly lighter gray than black
 let gridSize = 10; // Default size for each square in the grid
 let gridOpacity = 255; // Full opacity
 let gridScale = 0.46; // Grid scale (80%)
+let arcInfo = []; // Array to store information for drawing arcs
 
 // Define an array to hold grid configurations
 let grids = [
@@ -25,40 +26,78 @@ function setup() {
   setupOpacitySlider();
 
   noLoop(); // Draw only once and update on slider input
+
+  const generateBtn = document.getElementById("generate-btn");
+  generateBtn.addEventListener("click", generateSculpture);
 }
 
 function draw() {
-  background(bgColor); // Clear the canvas
-  blendMode(ADD); // Set blend mode to ADD for color blending
-  grids.forEach(drawGrid); // Draw each grid based on its configuration
-  blendMode(BLEND); // Reset blend mode
+  background(bgColor); // Clear the canvas with the background color
+
+  blendMode(ADD); // Use additive blending for color effects
+
+  grids.forEach(drawGrid); // Draw each grid, now including the arcs within the cells
+
+  blendMode(BLEND); // Reset blend mode after drawing
 }
 
 function drawGrid(grid) {
   push(); // Save the current drawing state
-  let gridDimension = min(width, height) * gridScale; // Use the smaller dimension to keep the grid square
-  let startX = width * grid.pct - gridDimension / 2; // Center grid horizontally
-  let startY = (height - gridDimension) / 2; // Center grid vertically
-  translate(startX, startY + grid.yOffset); // Apply translation
+  let gridDimension = min(width, height) * gridScale;
+  let startX = width * grid.pct - gridDimension / 2;
+  let startY = (height - gridDimension) / 2;
+  translate(startX, startY + grid.yOffset);
 
-  let cellSize = gridDimension / gridSize; // Calculate cell size to maintain a square grid
+  let cellSize = gridDimension / gridSize;
 
-  stroke(grid.color); // Set grid color
-  strokeWeight(grid.lineWidth); // Set line width
+  stroke(grid.color);
+  strokeWeight(grid.lineWidth);
 
-  // Draw columns
+  // Draw grid lines
   for (let col = 0; col <= gridSize; col++) {
     let x = col * cellSize;
-    line(x, 0, x, gridDimension); // Draw vertical line within the grid
+    line(x, 0, x, gridDimension);
   }
-
-  // Draw rows
   for (let row = 0; row <= gridSize; row++) {
     let y = row * cellSize;
-    line(0, y, gridDimension, y); // Draw horizontal line within the grid
+    line(0, y, gridDimension, y);
   }
 
-  pop(); // Restore the settings
+  // Draw arcs for each cell based on stored angles in arcInfo
+  arcInfo.forEach((info) => {
+    let cellCenterX = info.col * cellSize + cellSize / 2;
+    let cellCenterY = info.row * cellSize + cellSize / 2;
+
+    push();
+    translate(cellCenterX, cellCenterY);
+    rotate(info.angle);
+    noFill();
+    // Ensure arc spans from one corner to the opposite corner of the cell
+    arc(
+      -cellSize / 2,
+      -cellSize / 2,
+      sqrt(2) * cellSize,
+      sqrt(2) * cellSize,
+      0,
+      PI / 2
+    );
+    pop();
+  });
+
+  pop(); // Restore original drawing state
+}
+
+function generateSculpture() {
+  arcInfo = []; // Clear existing arc information
+
+  for (let col = 0; col < gridSize; col++) {
+    for (let row = 0; row < gridSize; row++) {
+      let angle = (PI / 2) * floor(random(1, 5)); // Random angle, multiple of PI/2
+      arcInfo.push({ col, row, angle });
+    }
+  }
+
+  redraw(); // Trigger a redraw to show the new arcs
 }
 
 function setupSlider() {
