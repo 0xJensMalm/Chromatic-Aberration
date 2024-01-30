@@ -3,6 +3,7 @@ let structureType = "line"; // Default structure type is 'line'
 let structures = []; // Array to hold the three structure instances
 let thicknessSlider;
 let offsetSlider;
+let rotationSlider;
 
 let bgColor = 20;
 let lineThickness = 2; // Default line thickness
@@ -30,12 +31,14 @@ function setup() {
   scaleSlider = createSlider(0.5, 2, 0.8, 0.01).parent(controlPanel);
   thicknessSlider = createSlider(1, 10, 2).parent(controlPanel);
   offsetSlider = createSlider(-0.02, 0.02, 0, 0.001).parent(controlPanel);
+  rotationSlider = createSlider(1, 100, 50, 0.01).parent(controlPanel); // Initialize with a default value of 50
 
   // Add input listeners to redraw the sketch when sliders are adjusted
   positionSlider.input(() => redraw());
   scaleSlider.input(() => redraw());
   thicknessSlider.input(() => redraw());
   offsetSlider.input(() => redraw());
+  rotationSlider.input(() => redraw());
 
   // Initialize structures
   updateStructure();
@@ -44,12 +47,13 @@ function setup() {
 function draw() {
   background(bgColor);
   blendMode(ADD);
-  updateSliderValues();
+
   structures.forEach((structure) => {
     structure.draw(); // Draw each structure in the array
   });
 
   blendMode(BLEND); // Reset blend mode to default
+  updateSliderValues();
 }
 
 function onStructureChange() {
@@ -90,17 +94,20 @@ function updateStructure() {
 
     // Create the structure based on the selected type
     if (structureType === "line") {
-      structures.push(new LineStructure(x, y, cellSize, cellCount, color));
+      structures.push(
+        new LineStructure(x, y, cellSize, cellCount, color, index)
+      );
     } else if (structureType === "circle") {
-      structures.push(new CircleStructure(x, y, cellSize, cellCount, color));
+      structures.push(
+        new CircleStructure(x, y, cellSize, cellCount, color, index)
+      );
     } else if (structureType === "diagonal") {
       structures.push(
-        new DiagonalLineStructure(x, y, cellSize, cellCount, color)
+        new DiagonalLineStructure(x, y, cellSize, cellCount, color, index)
       );
     }
   });
 }
-
 function updateSliderValues() {
   positionOffset = positionSlider.value();
   cellScale = scaleSlider.value();
