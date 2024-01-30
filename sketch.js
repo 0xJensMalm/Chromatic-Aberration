@@ -38,6 +38,7 @@ function setup() {
   offsetSlider = createSlider(-0.02, 0.02, 0, 0.001).parent(controlPanel);
   rotationSlider = createSlider(1, 100, 50, 0.01).parent(controlPanel); // Initialize with a default value of 50
   rotationSpeedSlider = createSlider(0, 100, 50).parent(controlPanel); // Default speed set to mid-range
+  currentRotationAngle = map(rotationSlider.value(), 1, 100, -PI, PI); // Assuming 50 maps to 0 radians
 
   // Add input listeners to redraw the sketch when sliders are adjusted
   positionSlider.input(() => redraw());
@@ -59,12 +60,13 @@ function draw() {
   blendMode(ADD);
 
   if (isPlaying) {
-    let speed = map(rotationSpeedSlider.value(), 0, 100, 0, TWO_PI / 60); // Full rotation over 60 frames at max speed
+    let speed = map(rotationSpeedSlider.value(), 0, 100, 0, TWO_PI / 60);
     currentRotationAngle += speed;
-
-    // Update rotationSlider's value based on currentRotationAngle
     let sliderValue = map(currentRotationAngle % TWO_PI, 0, TWO_PI, 1, 100);
     rotationSlider.value(sliderValue);
+  } else {
+    // Ensure the slider value maps correctly to the rotation angle
+    currentRotationAngle = map(rotationSlider.value(), 1, 100, -PI, PI);
   }
 
   structures.forEach((structure) => {
