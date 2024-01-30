@@ -61,6 +61,10 @@ function draw() {
   if (isPlaying) {
     let speed = map(rotationSpeedSlider.value(), 0, 100, 0, TWO_PI / 60); // Full rotation over 60 frames at max speed
     currentRotationAngle += speed;
+
+    // Update rotationSlider's value based on currentRotationAngle
+    let sliderValue = map(currentRotationAngle % TWO_PI, 0, TWO_PI, 1, 100);
+    rotationSlider.value(sliderValue);
   }
 
   structures.forEach((structure) => {
@@ -183,7 +187,11 @@ function togglePlayPause() {
 
   if (isPlaying) {
     loop(); // Resume the draw loop if playing
+    rotationSlider.attribute("disabled", ""); // Disable the rotation slider
+    rotationSlider.style("background-color", "#ccc"); // Change to grey color
   } else {
     noLoop(); // Stop the draw loop if paused
+    rotationSlider.removeAttribute("disabled"); // Enable the rotation slider
+    rotationSlider.style("background-color", ""); // Reset background color
   }
 }
