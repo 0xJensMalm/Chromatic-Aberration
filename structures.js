@@ -21,7 +21,6 @@ class Structure {
   }
 }
 
-// LineStructure subclass
 class LineStructure extends Structure {
   constructor(x, y, cellSize, cellCount, color, index) {
     super(x, y, cellSize, cellCount, color);
@@ -34,12 +33,16 @@ class LineStructure extends Structure {
       this.x + (this.cellSize * this.cellCount) / 2,
       this.y + (this.cellSize * this.cellCount) / 2
     );
-    let angle =
-      this.index === 0 || this.index === 2
-        ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
-        : 0;
 
-    rotate(angle);
+    if (rotationSlider.value() !== 50) {
+      // Check if the slider is not at its default value
+      let angle =
+        this.index === 0 || this.index === 2
+          ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
+          : 0;
+      rotate(angle);
+    }
+
     translate(
       (-this.cellSize * this.cellCount) / 2,
       (-this.cellSize * this.cellCount) / 2
@@ -68,12 +71,16 @@ class CircleStructure extends Structure {
       this.x + (this.cellSize * this.cellCount) / 2,
       this.y + (this.cellSize * this.cellCount) / 2
     );
-    let angle =
-      this.index === 0 || this.index === 2
-        ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
-        : 0;
 
-    rotate(angle);
+    if (rotationSlider.value() !== 50) {
+      // Check if the slider is not at its default value
+      let angle =
+        this.index === 0 || this.index === 2
+          ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
+          : 0;
+      rotate(angle);
+    }
+
     translate(
       (-this.cellSize * this.cellCount) / 2,
       (-this.cellSize * this.cellCount) / 2
@@ -103,11 +110,16 @@ class DiagonalLineStructure extends Structure {
       this.x + (this.cellSize * this.cellCount) / 2,
       this.y + (this.cellSize * this.cellCount) / 2
     );
-    let angle =
-      this.index === 0 || this.index === 2
-        ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
-        : 0;
-    rotate(angle);
+
+    if (rotationSlider.value() !== 50) {
+      // Check if the slider is not at its default value
+      let angle =
+        this.index === 0 || this.index === 2
+          ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
+          : 0;
+      rotate(angle);
+    }
+
     translate(
       (-this.cellSize * this.cellCount) / 2,
       (-this.cellSize * this.cellCount) / 2
@@ -119,6 +131,8 @@ class DiagonalLineStructure extends Structure {
         let x = i * this.cellSize;
         let y = j * this.cellSize;
         line(x, y, x + this.cellSize, y + this.cellSize);
+        // If you want diagonal lines in both directions, uncomment the next line
+        line(x + this.cellSize, y, x, y + this.cellSize); // Diagonal from top-right to bottom-left
       }
     }
     pop();
