@@ -34,14 +34,12 @@ class LineStructure extends Structure {
       this.y + (this.cellSize * this.cellCount) / 2
     );
 
-    if (rotationSlider.value() !== 50) {
-      // Check if the slider is not at its default value
-      let angle =
-        this.index === 0 || this.index === 2
-          ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
-          : 0;
-      rotate(angle);
-    }
+    // Apply continuous rotation based on the current angle for structures 1 and 3
+    let angle =
+      this.index === 0 || this.index === 2
+        ? currentRotationAngle * (this.index - 1)
+        : 0;
+    rotate(angle);
 
     translate(
       (-this.cellSize * this.cellCount) / 2,
@@ -72,14 +70,12 @@ class CircleStructure extends Structure {
       this.y + (this.cellSize * this.cellCount) / 2
     );
 
-    if (rotationSlider.value() !== 50) {
-      // Check if the slider is not at its default value
-      let angle =
-        this.index === 0 || this.index === 2
-          ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
-          : 0;
-      rotate(angle);
-    }
+    // Apply continuous rotation based on the current angle for structures 1 and 3
+    let angle =
+      this.index === 0 || this.index === 2
+        ? currentRotationAngle * (this.index - 1)
+        : 0;
+    rotate(angle);
 
     translate(
       (-this.cellSize * this.cellCount) / 2,
@@ -111,14 +107,12 @@ class DiagonalLineStructure extends Structure {
       this.y + (this.cellSize * this.cellCount) / 2
     );
 
-    if (rotationSlider.value() !== 50) {
-      // Check if the slider is not at its default value
-      let angle =
-        this.index === 0 || this.index === 2
-          ? map(rotationSlider.value(), 1, 100, -PI, PI) * (this.index - 1)
-          : 0;
-      rotate(angle);
-    }
+    // Apply continuous rotation based on the current angle for structures 1 and 3
+    let angle =
+      this.index === 0 || this.index === 2
+        ? currentRotationAngle * (this.index - 1)
+        : 0;
+    rotate(angle);
 
     translate(
       (-this.cellSize * this.cellCount) / 2,
@@ -130,9 +124,8 @@ class DiagonalLineStructure extends Structure {
       for (let j = 0; j < this.cellCount; j++) {
         let x = i * this.cellSize;
         let y = j * this.cellSize;
-        line(x, y, x + this.cellSize, y + this.cellSize);
-        // If you want diagonal lines in both directions, uncomment the next line
-        line(x + this.cellSize, y, x, y + this.cellSize); // Diagonal from top-right to bottom-left
+        line(x, y, x + this.cellSize, y + this.cellSize); // Diagonal from top-left to bottom-right
+        // Optionally add a diagonal line in the opposite direction if needed
       }
     }
     pop();

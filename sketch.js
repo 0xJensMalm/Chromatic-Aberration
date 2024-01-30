@@ -3,7 +3,12 @@ let structureType = "line"; // Default structure type is 'line'
 let structures = []; // Array to hold the three structure instances
 let thicknessSlider;
 let offsetSlider;
+
 let rotationSlider;
+let rotationSpeedSlider;
+let playButton;
+let isPlaying = false;
+let currentRotationAngle = 0; // Global variable to track the rotation angle
 
 let bgColor = 20;
 let lineThickness = 2; // Default line thickness
@@ -32,6 +37,7 @@ function setup() {
   thicknessSlider = createSlider(1, 10, 2).parent(controlPanel);
   offsetSlider = createSlider(-0.02, 0.02, 0, 0.001).parent(controlPanel);
   rotationSlider = createSlider(1, 100, 50, 0.01).parent(controlPanel); // Initialize with a default value of 50
+  rotationSpeedSlider = createSlider(0, 100, 50).parent(controlPanel); // Default speed set to mid-range
 
   // Add input listeners to redraw the sketch when sliders are adjusted
   positionSlider.input(() => redraw());
@@ -39,6 +45,10 @@ function setup() {
   thicknessSlider.input(() => redraw());
   offsetSlider.input(() => redraw());
   rotationSlider.input(() => redraw());
+  rotationSpeedSlider.input(() => redraw()); // Optional: Redraw when speed is adjusted
+
+  playButton = createButton("Play").parent(controlPanel);
+  playButton.mousePressed(togglePlayPause); // Function to toggle play/pause state
 
   // Initialize structures
   updateStructure();
@@ -48,11 +58,16 @@ function draw() {
   background(bgColor);
   blendMode(ADD);
 
+  if (isPlaying) {
+    let speed = map(rotationSpeedSlider.value(), 0, 100, 0, TWO_PI / 60); // Full rotation over 60 frames at max speed
+    currentRotationAngle += speed;
+  }
+
   structures.forEach((structure) => {
-    structure.draw(); // Draw each structure in the array
+    structure.draw();
   });
 
-  blendMode(BLEND); // Reset blend mode to default
+  blendMode(BLEND);
   updateSliderValues();
 }
 
@@ -160,4 +175,15 @@ function resetValues() {
 
   // Redraw the canvas to reflect the reset state
   redraw();
+}
+
+function togglePlayPause() {
+  isPlaying = !isPlaying; // Toggle the play state
+  playButton.html(isPlaying ? "Pause" : "Play"); // Update button text based on state
+
+  if (isPlaying) {
+    loop(); // Resume the draw loop if playing
+  } else {
+    noLoop(); // Stop the draw loop if paused
+  }
 }
