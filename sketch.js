@@ -8,44 +8,37 @@ let bgColor = 20;
 let lineThickness = 2; // Default line thickness
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // Set canvas size to fill the screen
-  noLoop(); // Draw only once and update on dropdown change
+  createCanvas(windowWidth, windowHeight); // Ensure the canvas fills the body
 
-  // Dropdown menu for selecting the structure type
-  const structureDropdown = createSelect();
-  structureDropdown.position(10, 10);
+  // Select the control panel div
+  const controlPanel = select("#control-panel");
+
+  // Create and append the structure type dropdown to the control panel
+  const structureDropdown = createSelect().parent(controlPanel);
   structureDropdown.option("Line Grid", "line");
   structureDropdown.option("Circles", "circle");
   structureDropdown.option("Diagonal Lines", "diagonal");
-
-  structureDropdown.selected("line"); // Set 'line' as the default selected value
+  structureDropdown.selected("line");
   structureDropdown.changed(onStructureChange);
 
-  // Position Slider
-  positionSlider = createSlider(0, 100, 0); // Start at 0, range up to 100
-  positionSlider.position(10, 40);
-  positionSlider.input(() => redraw()); // Redraw when the slider is moved
+  // Create and append the reset button to the control panel
+  const resetButton = createButton("Reset").parent(controlPanel);
+  resetButton.mousePressed(resetValues);
 
-  // Scale Slider
-  // Scale Slider
-  scaleSlider = createSlider(0.5, 2, 0.8, 0.01); //
-  scaleSlider.position(10, 80);
-  scaleSlider.input(() => redraw()); // Redraw when the slider is moved
+  // Create and append sliders to the control panel
+  positionSlider = createSlider(0, 100, 0).parent(controlPanel);
+  scaleSlider = createSlider(0.5, 2, 0.8, 0.01).parent(controlPanel);
+  thicknessSlider = createSlider(1, 10, 2).parent(controlPanel);
+  offsetSlider = createSlider(-0.02, 0.02, 0, 0.001).parent(controlPanel);
 
-  // Line Thickness Slider
-  thicknessSlider = createSlider(1, 10, 2); // Range from 1 to 10, default at 2
-  thicknessSlider.position(10, 120);
-  thicknessSlider.input(() => {
-    lineThickness = thicknessSlider.value();
-    redraw(); // Redraw when the slider is moved
-  });
+  // Add input listeners to redraw the sketch when sliders are adjusted
+  positionSlider.input(() => redraw());
+  scaleSlider.input(() => redraw());
+  thicknessSlider.input(() => redraw());
+  offsetSlider.input(() => redraw());
 
-  // Offset Slider
-  offsetSlider = createSlider(-0.02, 0.02, 0, 0.001); // Range with a small step for precise control
-  offsetSlider.position(10, 160); // Adjust the position as needed
-  offsetSlider.input(() => redraw()); // Redraw when the slider is moved
-
-  updateStructure(); // Initialize structures
+  // Initialize structures
+  updateStructure();
 }
 
 function draw() {
@@ -143,4 +136,21 @@ function updateSliderValues() {
 
   // Re-calculate structure positions and cell sizes
   updateStructure();
+}
+
+function resetValues() {
+  // Reset sliders to default values
+  positionSlider.value(0); // Default position
+  scaleSlider.value(0.8); // Default scale
+  thicknessSlider.value(2); // Default line thickness
+  offsetSlider.value(0); // Default vertical offset
+
+  // Reset any other settings if needed
+  // For example, resetting the selected structure type to 'line'
+  structureType = "line";
+  const structureDropdown = select("#pattern-chooser"); // Assuming your dropdown has an id 'pattern-chooser'
+  structureDropdown.selected("line");
+
+  // Redraw the canvas to reflect the reset state
+  redraw();
 }
