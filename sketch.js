@@ -9,6 +9,7 @@ const config = {
     scale: 0.8,
     lineThickness: 2,
     yOffset: 0,
+    rotation: 0,
   },
 };
 let structures = [];
@@ -23,7 +24,13 @@ function setup() {
 function draw() {
   background(config.bgColor);
   blendMode(ADD);
-  structures.forEach((structure) => structure.draw());
+  structures.forEach(({ structure, centerX, centerY, rotationAngle }) => {
+    push(); // Save the current drawing state
+    translate(centerX, centerY); // Move the origin to the structure's center
+    rotate(rotationAngle); // Rotate around the new origin
+    structure.draw(); // Draw the structure at the translated and rotated origin
+    pop(); // Restore the original drawing state
+  });
   blendMode(BLEND);
 }
 
@@ -48,14 +55,21 @@ function createControlPanel() {
       min: 1,
       max: 10,
       step: 0.1,
-      label: "Line Thickness",
+      label: "Thickness",
     },
     {
       id: "yOffset",
       min: -0.02,
       max: 0.02,
       step: 0.001,
-      label: "Vertical Offset",
+      label: "Offset",
+    },
+    {
+      id: "rotation", // Unique ID for the rotation slider
+      min: 0, // Minimum value (0 degrees)
+      max: 360, // Maximum value (360 degrees)
+      step: 0.01, // Step size
+      label: "Rotation", // Label for the slider
     },
   ];
 
@@ -89,9 +103,16 @@ function updateStructure() {
   const cellSize = config.baseCellSize * sliders.scale.value();
   const yOffset = sliders.yOffset.value();
   const positionValue = sliders.position.value();
+  const rotationValue = sliders.rotation.value(); // Get the rotation value from the slider
 
-  // Calculate positions based on the slider value
-  // For a smooth transition, the mapping should be direct and linear without jumps
+  // Define colors for each structure
+  const colors = [
+    "rgba(255, 0, 0, 100)",
+    "rgba(0, 255, 0, 100)",
+    "rgba(0, 0, 255, 100)",
+  ];
+
+  // Calculate positions based on the slider value for a smooth transition
   let positions = [
     map(positionValue, 0, 100, 0.25, 0.75), // Map for the left structure
     0.5, // Center structure remains static
@@ -99,25 +120,34 @@ function updateStructure() {
   ];
 
   positions.forEach((posX, index) => {
-    let x = width * posX - (cellSize * config.cellCount) / 2;
-    let y = height / 2 - (cellSize * config.cellCount) / 2;
-    y += index === 0 ? -height * yOffset : index === 2 ? height * yOffset : 0;
+    // Calculate the center position for each structure
+    let centerX = width * posX;
+    let centerY =
+      height / 2 +
+      (index === 0 ? -height * yOffset : index === 2 ? height * yOffset : 0);
 
-    const color = [
-      "rgba(255, 0, 0, 100)",
-      "rgba(0, 255, 0, 100)",
-      "rgba(0, 0, 255, 100)",
-    ][index];
-    structures.push(
-      structureFactory(
+    // Determine rotation angle: middle structure stays still, outer structures rotate in opposite directions
+    let rotationAngle = 0; // Default rotation for the middle structure
+    if (index === 0) {
+      rotationAngle = radians(rotationValue); // Rotate the first structure clockwise
+    } else if (index === 2) {
+      rotationAngle = -radians(rotationValue); // Rotate the third structure counter-clockwise
+    }
+
+    // Store the structure along with its center position and rotation angle
+    structures.push({
+      structure: structureFactory(
         config.defaultValues.structureType,
-        x,
-        y,
+        -(cellSize * config.cellCount) / 2, // Adjusted to draw from new origin
+        -(cellSize * config.cellCount) / 2, // Adjusted to draw from new origin
         cellSize,
         config.cellCount,
-        color
-      )
-    );
+        colors[index] // Pass the color from the defined array
+      ),
+      centerX: centerX,
+      centerY: centerY,
+      rotationAngle: rotationAngle, // Set the calculated rotation angle
+    });
   });
 
   redraw();
