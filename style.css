@@ -3,43 +3,49 @@ body, html {
     padding: 0;
     overflow: hidden; /* Ensures no scrollbars */
   }
+  
   #control-panel {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 5px 10px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.8rem;
-  border: 1px solid black;
-}
-
-#control-panel > div {
-  display: flex;
-  align-items: center;
-  gap: 5px; /* Space between slider and its value display */
-}
-
-#control-panel span {
-    white-space: nowrap;
-    display: inline-block;
-    width: 50px; /* Fixed width for value display */
-    text-align: right; /* Aligns the text to the right, making it easier to read */
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid black;
   }
-
-  #control-panel select, #control-panel input[type="button"], #control-panel input[type="slider"] {
+  
+  #control-panel > div {
+    margin-bottom: 15px; /* Space between each slider group */
+  }
+  
+  #control-panel .slider-label, #control-panel .slider-value {
+    text-align: center;
+  }
+  
+  #control-panel select, #control-panel input[type="button"], #control-panel input[type="number"], #control-panel input[type="range"] {
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 4px;
     background-color: #f9f9f9;
     cursor: pointer; /* Hand cursor for dropdown and buttons */
+    margin-top: 2px; /* Small space above sliders and inputs */
   }
-  #control-panel input[type="slider"] {
-    cursor: default; /* Override for sliders */
+  
+  #control-panel input[type="range"] {
+    cursor: default; /* Default cursor for sliders */
+  }
+  
+  /* Container for sliders and their automation controls */
+  .slider-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Specific styles for automation controls to align them horizontally */
+  .automation-controls {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
   }
   

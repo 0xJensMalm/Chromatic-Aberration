@@ -49,7 +49,7 @@ function createControlPanel() {
   // Structure Dropdown
   const structureDropdown = createSelect().parent(controlPanel);
   config.structureTypes.forEach((type) => {
-    const optionName = type.charAt(0).toUpperCase() + type.slice(1); // Capitalize first letter
+    const optionName = type.charAt(0).toUpperCase() + type.slice(1);
     structureDropdown.option(optionName, type);
   });
   structureDropdown.selected(config.defaultValues.structureType);
@@ -59,64 +59,57 @@ function createControlPanel() {
   const sliderData = [
     { id: "position", min: 0, max: 100, step: 1, label: "Position" },
     { id: "scale", min: 0.5, max: 2, step: 0.01, label: "Scale" },
-    {
-      id: "lineThickness",
-      min: 1,
-      max: 10,
-      step: 0.1,
-      label: "Thickness",
-    },
-    {
-      id: "yOffset",
-      min: -0.02,
-      max: 0.02,
-      step: 0.001,
-      label: "Offset",
-    },
-    {
-      id: "rotation", // Unique ID for the rotation slider
-      min: 0, // Minimum value (0 degrees)
-      max: 360, // Maximum value (360 degrees)
-      step: 0.01, // Step size
-      label: "Rotation", // Label for the slider
-    },
+    { id: "lineThickness", min: 1, max: 10, step: 0.1, label: "Thickness" },
+    { id: "yOffset", min: -0.02, max: 0.02, step: 0.001, label: "Offset" },
+    { id: "rotation", min: 0, max: 360, step: 0.01, label: "Rotation" },
   ];
 
   sliderData.forEach(({ id, min, max, step, label }) => {
-    let container = createDiv(label + ": ")
+    let sliderContainer = createDiv()
       .parent(controlPanel)
-      .style("margin", "4px 0");
-    sliders[id] = createSlider(min, max, config.defaultValues[id], step).parent(
-      container
-    );
-    sliders[id].input(() => updateStructure()); // Update structure on slider input
-
-    // Create a span to display the slider's value
-    sliders[id].valueSpan = createSpan(config.defaultValues[id]).parent(
-      container
-    );
-    sliders[id].input(() => {
-      sliders[id].valueSpan.html(sliders[id].value());
-      updateStructure();
-    });
+      .class("slider-container");
+    createSliderGroup(sliderContainer, id, min, max, step, label);
+    if (id === "rotation") {
+      // Add automation controls only next to the rotation slider for now
+      createAutomationControls(sliderContainer, id);
+    }
   });
-  // Rotation Speed Input
-  let speedContainer = createDiv("Rotation Speed: ")
-    .parent(controlPanel)
-    .style("margin", "4px 0")
-    .style("display", "flex")
-    .style("align-items", "center");
-  let rotationSpeedInput = createInput("1", "number")
-    .parent(speedContainer)
-    .style("margin-right", "10px")
-    .style("width", "60px");
-  sliders.rotationSpeed = rotationSpeedInput; // Store for later use
+}
 
-  // Play/Pause Button
-  let playPauseButton = createButton("Play")
-    .parent(speedContainer)
-    .mousePressed(togglePlayPause);
-  sliders.playPauseButton = playPauseButton; // Store for later use
+function createSliderGroup(parent, id, min, max, step, label) {
+  let labelDiv = createDiv(label + ": ")
+    .parent(parent)
+    .class("slider-label");
+  sliders[id] = createSlider(min, max, config.defaultValues[id], step).parent(
+    parent
+  );
+  sliders[id].input(() => updateStructure());
+
+  let valueSpan = createSpan(config.defaultValues[id])
+    .parent(parent)
+    .class("slider-value");
+  sliders[id].input(() => {
+    valueSpan.html(sliders[id].value());
+    updateStructure();
+  });
+}
+
+function createAutomationControls(parent, sliderId) {
+  let automationControls = createDiv()
+    .parent(parent)
+    .class("automation-controls");
+
+  // Speed Input for the rotation
+  createDiv("Speed: ").parent(automationControls).style("margin-right", "5px");
+  sliders[sliderId + "Speed"] = createInput("1", "number")
+    .parent(automationControls)
+    .style("width", "60px");
+
+  // Play/Pause Button for the rotation
+  sliders[sliderId + "PlayPause"] = createButton("Play")
+    .parent(automationControls)
+    .style("margin-left", "10px")
+    .mousePressed(() => togglePlayPause(sliderId));
 }
 
 function onStructureChange() {
