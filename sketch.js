@@ -27,20 +27,64 @@ function draw() {
   background(config.bgColor);
   blendMode(ADD);
   structures.forEach(({ structure, centerX, centerY, rotationAngle }) => {
-    push(); // Save the current drawing state
-    translate(centerX, centerY); // Move the origin to the structure's center
-    rotate(rotationAngle); // Rotate around the new origin
-    structure.draw(); // Draw the structure at the translated and rotated origin
-    pop(); // Restore the original drawing state
+    push();
+    translate(centerX, centerY);
+    rotate(rotationAngle);
+    structure.draw();
+    pop();
   });
   blendMode(BLEND);
-  if (isPlaying) {
-    let currentRotation = parseFloat(sliders.rotation.value());
-    rotationSpeed = parseFloat(sliders.rotationSpeed.value());
-    let newRotation = (currentRotation + rotationSpeed) % 360; // Ensure rotation stays within 0-360
-    sliders.rotation.value(newRotation); // Update the slider position
-    updateStructure(); // Call to reflect changes in the structure
-  }
+
+  // Iterate over all sliders for automation
+  Object.keys(sliders).forEach((sliderId) => {
+    if (sliderId.endsWith("Automation")) {
+      let automation = sliders[sliderId];
+      if (automation.isPlaying) {
+        let speedPercent = parseFloat(automation.speedInput.value()) / 100;
+        let actualSliderId = sliderId.replace("Automation", "");
+        let slider = sliders[actualSliderId];
+        let value = parseFloat(slider.value());
+
+        let speed;
+        if (actualSliderId === "rotation") {
+          // For rotation, 100% speed corresponds to the previous 3
+          speed = 3 * speedPercent; // No direction change for continuous rotation
+          value += speed; // Continuous increment
+          value %= 360; // Ensure value stays within 0-360 degrees
+        } else {
+          // Other sliders
+          speed = Math.max(speedPercent, 0.1) * automation.direction; // Ensure a minimum speed to see movement
+          switch (actualSliderId) {
+            case "position":
+              speed *= 10;
+              break;
+            case "scale":
+              speed *= 0.2;
+              break;
+            case "lineThickness":
+              speed *= 0.4;
+              break;
+            case "yOffset":
+              speed *= 0.01;
+              break;
+            default:
+              break; // No additional scaling needed
+          }
+
+          value += speed;
+
+          // Reverse direction at bounds
+          if (value >= slider.elt.max || value <= slider.elt.min) {
+            automation.direction *= -1; // Change direction
+          }
+        }
+
+        slider.value(constrain(value, slider.elt.min, slider.elt.max)); // Update slider value within bounds
+      }
+    }
+  });
+
+  updateStructure(); // Reflect changes
 }
 
 function createControlPanel() {
@@ -77,39 +121,64 @@ function createControlPanel() {
 }
 
 function createSliderGroup(parent, id, min, max, step, label) {
-  let labelDiv = createDiv(label + ": ")
-    .parent(parent)
+  let groupContainer = createDiv().parent(parent).class("slider-container");
+  createDiv(label + ": ")
+    .parent(groupContainer)
     .class("slider-label");
-  sliders[id] = createSlider(min, max, config.defaultValues[id], step).parent(
-    parent
+
+  let slider = createSlider(min, max, config.defaultValues[id], step).parent(
+    groupContainer
   );
-  sliders[id].input(() => updateStructure());
+  sliders[id] = slider;
+  slider.input(() => updateStructure());
 
   let valueSpan = createSpan(config.defaultValues[id])
-    .parent(parent)
+    .parent(groupContainer)
     .class("slider-value");
-  sliders[id].input(() => {
-    valueSpan.html(sliders[id].value());
+  slider.input(() => {
+    valueSpan.html(slider.value());
     updateStructure();
   });
+
+  // Add automation controls for this slider
+  createAutomationControls(groupContainer, id, min, max);
 }
 
 function createAutomationControls(parent, sliderId) {
-  let automationControls = createDiv()
+  // Check if the controls already exist to prevent duplicates for the rotation slider
+  if (sliders[sliderId + "Automation"]) {
+    return;
+  }
+
+  let automationContainer = createDiv()
     .parent(parent)
     .class("automation-controls");
 
-  // Speed Input for the rotation
-  createDiv("Speed: ").parent(automationControls).style("margin-right", "5px");
-  sliders[sliderId + "Speed"] = createInput("1", "number")
-    .parent(automationControls)
-    .style("width", "60px");
+  // Speed Input
+  createDiv("Speed: ").parent(automationContainer).style("margin-right", "5px");
+  let speedInput = createInput("10", "text")
+    .parent(automationContainer)
+    .style("width", "50px");
 
-  // Play/Pause Button for the rotation
-  sliders[sliderId + "PlayPause"] = createButton("Play")
-    .parent(automationControls)
+  // Play/Pause Button
+  let playPauseButton = createButton("Play")
+    .parent(automationContainer)
     .style("margin-left", "10px")
     .mousePressed(() => togglePlayPause(sliderId));
+
+  // Store automation controls
+  sliders[sliderId + "Automation"] = {
+    speedInput: speedInput,
+    playPauseButton: playPauseButton,
+    isPlaying: false,
+    direction: 1, // Direction flag for back-and-forth movement
+  };
+}
+
+function togglePlayPause(sliderId) {
+  let automation = sliders[sliderId + "Automation"];
+  automation.isPlaying = !automation.isPlaying;
+  automation.playPauseButton.html(automation.isPlaying ? "Pause" : "Play");
 }
 
 function onStructureChange() {
@@ -185,9 +254,4 @@ function structureFactory(type, x, y, cellSize, cellCount, color) {
     default:
       throw new Error("Unknown structure type: " + type);
   }
-}
-function togglePlayPause() {
-  isPlaying = !isPlaying;
-  sliders.playPauseButton.html(isPlaying ? "Pause" : "Play");
-  sliders.rotation.attribute("disabled", isPlaying); // Enable/disable slider
 }
