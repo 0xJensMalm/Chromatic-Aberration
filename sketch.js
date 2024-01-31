@@ -14,6 +14,8 @@ const config = {
 };
 let structures = [];
 let sliders = {};
+let isPlaying = false;
+let rotationSpeed = 1; // Default speed
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -32,6 +34,13 @@ function draw() {
     pop(); // Restore the original drawing state
   });
   blendMode(BLEND);
+  if (isPlaying) {
+    let currentRotation = parseFloat(sliders.rotation.value());
+    rotationSpeed = parseFloat(sliders.rotationSpeed.value());
+    let newRotation = (currentRotation + rotationSpeed) % 360; // Ensure rotation stays within 0-360
+    sliders.rotation.value(newRotation); // Update the slider position
+    updateStructure(); // Call to reflect changes in the structure
+  }
 }
 
 function createControlPanel() {
@@ -91,6 +100,23 @@ function createControlPanel() {
       updateStructure();
     });
   });
+  // Rotation Speed Input
+  let speedContainer = createDiv("Rotation Speed: ")
+    .parent(controlPanel)
+    .style("margin", "4px 0")
+    .style("display", "flex")
+    .style("align-items", "center");
+  let rotationSpeedInput = createInput("1", "number")
+    .parent(speedContainer)
+    .style("margin-right", "10px")
+    .style("width", "60px");
+  sliders.rotationSpeed = rotationSpeedInput; // Store for later use
+
+  // Play/Pause Button
+  let playPauseButton = createButton("Play")
+    .parent(speedContainer)
+    .mousePressed(togglePlayPause);
+  sliders.playPauseButton = playPauseButton; // Store for later use
 }
 
 function onStructureChange() {
@@ -166,4 +192,9 @@ function structureFactory(type, x, y, cellSize, cellCount, color) {
     default:
       throw new Error("Unknown structure type: " + type);
   }
+}
+function togglePlayPause() {
+  isPlaying = !isPlaying;
+  sliders.playPauseButton.html(isPlaying ? "Pause" : "Play");
+  sliders.rotation.attribute("disabled", isPlaying); // Enable/disable slider
 }
