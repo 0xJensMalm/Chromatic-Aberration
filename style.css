@@ -1,0 +1,45 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Ensures no scrollbars */
+  }
+  #control-panel {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  border: 1px solid black;
+}
+
+#control-panel > div {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between slider and its value display */
+}
+
+#control-panel span {
+    white-space: nowrap;
+    display: inline-block;
+    width: 50px; /* Fixed width for value display */
+    text-align: right; /* Aligns the text to the right, making it easier to read */
+  }
+
+  #control-panel select, #control-panel input[type="button"], #control-panel input[type="slider"] {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px;
+    background-color: #f9f9f9;
+    cursor: pointer; /* Hand cursor for dropdown and buttons */
+  }
+  #control-panel input[type="slider"] {
+    cursor: default; /* Override for sliders */
+  }
+  
