@@ -9,43 +9,43 @@ body, html {
     top: 10px;
     left: 10px;
     z-index: 10;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid black;
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly more transparent for a lighter feel */
+    padding: 5px; /* Reduced padding */
+    border-radius: 5px; /* Smaller border-radius */
+    border: 1px solid #ccc; /* Lighter border */
+    font-size: 0.75rem; /* Smaller text size */
   }
   
   #control-panel > div {
-    margin-bottom: 15px; /* Space between each slider group */
+    margin-bottom: 8px; /* Reduced space between control groups */
   }
   
   #control-panel .slider-label, #control-panel .slider-value {
     text-align: center;
+    margin: 2px 0; /* Reduced margin for tighter spacing */
   }
   
   #control-panel select, #control-panel input[type="button"], #control-panel input[type="number"], #control-panel input[type="range"] {
     border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 4px;
+    border-radius: 3px; /* Smaller radius for a more subtle look */
+    padding: 2px 4px; /* Reduced padding for a more compact appearance */
     background-color: #f9f9f9;
     cursor: pointer; /* Hand cursor for dropdown and buttons */
-    margin-top: 2px; /* Small space above sliders and inputs */
+    font-size: 0.75rem; /* Match the font size of the panel */
   }
   
   #control-panel input[type="range"] {
     cursor: default; /* Default cursor for sliders */
   }
   
-  /* Container for sliders and their automation controls */
   .slider-container {
     display: flex;
     align-items: center;
   }
   
-  /* Specific styles for automation controls to align them horizontally */
   .automation-controls {
     display: flex;
     align-items: center;
-    margin-left: 10px;
+    margin-left: 5px; /* Reduced margin for a more compact layout */
   }
   
