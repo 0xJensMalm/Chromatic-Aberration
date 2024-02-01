@@ -1,45 +1,52 @@
 body, html {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Ensures no scrollbars */
-  }
-  #control-panel {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 5px 10px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.8rem;
-  border: 1px solid black;
+    overflow: hidden; /* Prevents scrollbars */
 }
 
-#control-panel > div {
-  display: flex;
-  align-items: center;
-  gap: 5px; /* Space between slider and its value display */
+#control-panel {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.8); /* Darker and more opaque for better visibility */
+    padding: 5px;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap; /* Allows elements to wrap to the next line */
+    align-items: center;
+    gap: 4px; /* Slightly increased gap for clarity */
+    font-size: 0.8rem;
+    border: 1px solid #444; /* Dark border for contrast */
+    color: white; /* Makes text color white for visibility */
 }
 
-#control-panel span {
-    white-space: nowrap;
-    display: inline-block;
-    width: 50px; /* Fixed width for value display */
-    text-align: right; /* Aligns the text to the right, making it easier to read */
-  }
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Compact gap between elements within the slider container */
+}
 
-  #control-panel select, #control-panel input[type="button"], #control-panel input[type="slider"] {
+.slider-label, .slider-value {
+    margin-right: 2px; /* Reduced margin for compactness */
+}
+
+#control-panel select, #control-panel input[type="text"], #control-panel input[type="button"], #control-panel input[type="range"] {
     border: 1px solid #ddd;
     border-radius: 4px;
-    padding: 4px;
+    padding: 2px; /* Reduced padding for a more compact look */
     background-color: #f9f9f9;
-    cursor: pointer; /* Hand cursor for dropdown and buttons */
-  }
-  #control-panel input[type="slider"] {
-    cursor: default; /* Override for sliders */
-  }
-  
+    cursor: pointer; /* Cursor indication for interactive elements */
+}
+
+#control-panel input[type="range"] {
+    cursor: grab; /* Cursor change to indicate slider functionality */
+    width: auto; /* Allows the slider to adjust its width based on available space */
+}
+
+.automation-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Compact gap within automation controls */
+}
