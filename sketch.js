@@ -3,7 +3,14 @@ const config = {
   baseCellSize: 40,
   cellCount: 10, // This now becomes the default starting cell count
   maxCellCount: 100, // New attribute to define the maximum cell count
-  structureTypes: ["line", "circle", "diagonal", "sineWave"],
+  structureTypes: [
+    "line",
+    "circle",
+    "diagonal",
+    "sineWave",
+    "checkerboard",
+    "symmetricalColor",
+  ],
   defaultValues: {
     structureType: "circle",
     position: 0,
@@ -55,12 +62,15 @@ function draw() {
 
 function createControlPanel() {
   const controlPanel = select("#control-panel");
-  const slidersContainer = createDiv()
-    .parent(controlPanel)
-    .id("sliders-container");
+
+  // Container for top controls (Structure Picker, Speed Control, Play/Pause Button, and Centralize Button)
+  const topContainer = createDiv().parent(controlPanel).class("top-container");
+
+  // Automation controls (Speed and Play/Pause) at the top
+  createAutomationControls(topContainer, "rotation");
 
   // Structure Dropdown
-  const structureDropdown = createSelect().parent(controlPanel);
+  const structureDropdown = createSelect().parent(topContainer);
   config.structureTypes.forEach((type) => {
     const optionName = type.charAt(0).toUpperCase() + type.slice(1);
     structureDropdown.option(optionName, type);
@@ -68,78 +78,50 @@ function createControlPanel() {
   structureDropdown.selected(config.defaultValues.structureType);
   structureDropdown.changed(onStructureChange);
 
-  // Sliders
+  // Centralize Button
+  const centralizeButton = createButton("Centralize").parent(topContainer);
+  centralizeButton.mousePressed(() => {
+    sliders.position.value(50); // Set the position slider to the middle
+    updateStructure(); // Reflect the change
+  });
+
+  // Container for sliders
+  const slidersContainer = createDiv()
+    .parent(controlPanel)
+    .class("sliders-container");
+
+  // Slider configurations
   const sliderData = [
     { id: "position", min: 0, max: 100, step: 1, label: "Position" },
     { id: "scale", min: 0.5, max: 2, step: 0.01, label: "Scale" },
     { id: "lineThickness", min: 1, max: 10, step: 0.1, label: "Thickness" },
-    { id: "yOffset", min: -0.02, max: 0.02, step: 0.001, label: "Offset" },
+    { id: "yOffset", min: -0.02, max: 0.02, step: 0.001, label: "Y Offset" },
     { id: "rotation", min: 0, max: 360, step: 0.01, label: "Rotation" },
+    {
+      id: "cellCount",
+      min: 10,
+      max: config.maxCellCount,
+      step: 1,
+      label: "Cell Count",
+    },
   ];
 
+  // Create each slider with label and value next to it
   sliderData.forEach(({ id, min, max, step, label }) => {
     let sliderContainer = createDiv()
-      .parent(controlPanel)
+      .parent(slidersContainer)
       .class("slider-container");
-    createDiv(label + ": ")
+    let sliderLabel = createDiv(`${label}: ${config.defaultValues[id]}`)
       .parent(sliderContainer)
       .class("slider-label");
     let slider = createSlider(min, max, config.defaultValues[id], step).parent(
       sliderContainer
     );
     sliders[id] = slider;
-    slider.input(() => updateStructure());
-
-    let valueSpan = createSpan(config.defaultValues[id])
-      .parent(sliderContainer)
-      .class("slider-value");
     slider.input(() => {
-      valueSpan.html(slider.value());
+      sliderLabel.html(`${label}: ${slider.value()}`); // Update label with value
       updateStructure();
     });
-
-    if (id === "rotation") {
-      // Add automation controls only next to the rotation slider
-      createAutomationControls(sliderContainer, id);
-    }
-  });
-  // New Cell Count Slider
-  let cellCountContainer = createDiv()
-    .parent(slidersContainer)
-    .class("slider-container");
-  createDiv("Cell Count: ").parent(cellCountContainer).class("slider-label");
-  let cellCountSlider = createSlider(
-    10,
-    config.maxCellCount,
-    config.defaultValues.cellCount,
-    1
-  ).parent(cellCountContainer);
-  sliders["cellCount"] = cellCountSlider;
-  cellCountSlider.input(() => updateStructure());
-
-  let cellCountValueSpan = createSpan(config.defaultValues.cellCount)
-    .parent(cellCountContainer)
-    .class("slider-value");
-  cellCountSlider.input(() => {
-    cellCountValueSpan.html(cellCountSlider.value());
-    updateStructure();
-  });
-
-  // Centralize Button
-  let centralizeButton = createButton("Centralize").parent(controlPanel);
-  centralizeButton.mousePressed(() => {
-    // Set the position slider to 50 and update the structure
-    sliders.position.value(50);
-    updateStructure();
-  });
-
-  // Ensure the value display for the position slider is also updated
-  sliders.position.input(() => {
-    let valueSpan = select(".slider-value", sliders.position.parent());
-    if (valueSpan) {
-      valueSpan.html(sliders.position.value());
-    }
-    updateStructure();
   });
 }
 
@@ -157,8 +139,8 @@ function createAutomationControls(parent, sliderId) {
   // Play/Pause Button
   let playPauseButton = createButton("Play")
     .parent(automationContainer)
-    .style("margin-left", "10px")
-    .mousePressed(() => togglePlayPause(sliderId));
+    .style("margin-left", "10px");
+  playPauseButton.mousePressed(() => togglePlayPause(sliderId));
 
   // Store automation controls
   sliders[sliderId + "Automation"] = {
@@ -178,6 +160,7 @@ function onStructureChange() {
   config.defaultValues.structureType = this.value();
   updateStructure();
 }
+
 function updateStructure() {
   structures = [];
   const cellSize = config.baseCellSize * sliders.scale.value();
@@ -244,6 +227,11 @@ function structureFactory(type, x, y, cellSize, cellCount, color) {
       return new DiagonalLineStructure(x, y, cellSize, cellCount, color);
     case "sineWave":
       return new SineWaveStructure(x, y, cellSize, cellCount, color);
+    case "checkerboard":
+      return new CheckerboardStructure(x, y, cellSize, cellCount, color);
+    case "symmetricalColor":
+      return new SymmetricalColorStructure(x, y, cellSize, cellCount, color);
+
     default:
       throw new Error("Unknown structure type: " + type);
   }

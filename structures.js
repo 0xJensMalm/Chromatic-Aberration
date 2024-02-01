@@ -95,3 +95,58 @@ class SineWaveStructure extends Structure {
     pop();
   }
 }
+
+class CheckerboardStructure extends Structure {
+  draw() {
+    push();
+    for (let i = 0; i < this.cellCount; i++) {
+      for (let j = 0; j < this.cellCount; j++) {
+        if ((i + j) % 2 == 0) {
+          fill(this.color);
+        } else {
+          noFill();
+        }
+        rect(
+          this.x + i * this.cellSize,
+          this.y + j * this.cellSize,
+          this.cellSize,
+          this.cellSize
+        );
+      }
+    }
+    pop();
+  }
+}
+
+class SymmetricalColorStructure extends Structure {
+  draw() {
+    push();
+    translate(
+      this.x + (this.cellSize * this.cellCount) / 2,
+      this.y + (this.cellSize * this.cellCount) / 2
+    );
+    noFill();
+    stroke(this.color); // Use the base color provided to the constructor
+    strokeWeight(1);
+    this.drawSymmetricalPattern();
+    pop();
+  }
+
+  drawSymmetricalPattern() {
+    const steps = this.cellCount; // Number of steps for the pattern
+    const angleStep = TWO_PI / steps;
+    const radius = (this.cellSize * this.cellCount) / 2;
+
+    for (let i = 0; i < steps; i++) {
+      const angle = i * angleStep;
+      const nextAngle = (i + 1) * angleStep;
+
+      for (let j = 0; j < radius; j += this.cellSize) {
+        strokeWeight(
+          map(j, 0, radius, this.cellSize * 0.1, this.cellSize * 0.5)
+        );
+        arc(0, 0, j * 2, j * 2, angle, nextAngle);
+      }
+    }
+  }
+}
